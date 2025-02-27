@@ -41,3 +41,20 @@ export type UsersListType = {
     email: string;
   }[];
 };
+
+export type AttendanceListType = {
+  data: {
+    id: string;
+    date: Date;
+    clockIn: Date;
+    clockOut: Date;
+    clockInDesc: string | null;
+    clockOutDesc: string | null;
+    userId: number;
+    user: {
+      id: number;
+      name: string;
+      email: string;
+    };
+  }[];
+};

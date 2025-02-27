@@ -24,3 +24,11 @@ const attendancePage = async (props: { params: Params }) => {
 };
 
 export default attendancePage;
+
+// export async function generateStaticParams() {
+//   const usersData = await fetchUsers();
+
+//   return usersData.data.map((user) => ({
+//     userId: user.id.toString(),
+//   }));
+// }

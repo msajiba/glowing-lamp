@@ -43,6 +43,7 @@ export default function UsersList({ usersData }: Props) {
               <TableCell>
                 <Link
                   href={`/attendance/${record.id}`}
+                  target="_blank"
                   className="text-blue-500"
                 >
                   View Attendance

@@ -23,6 +23,12 @@ export default function Navbar() {
                 employees
               </Link>
               <Link
+                href="/attendance-list"
+                className="text-white bg-gray-700  px-3 py-2 rounded-md text-sm font-medium"
+              >
+                attendance list
+              </Link>
+              <Link
                 href="/attendance"
                 className="text-white bg-gray-700  px-3 py-2 rounded-md text-sm font-medium"
               >
