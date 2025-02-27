@@ -27,14 +27,24 @@ export async function GET(
       });
     }
 
-    const attendance = await prisma.attendance.findMany({
+    const startOfDay = new Date();
+    startOfDay.setHours(0, 0, 0, 0);
+    const endOfDay = new Date();
+    endOfDay.setHours(23, 59, 59, 999);
+
+    // Query to find today's attendance for the given user
+    const todayAttendance = await prisma.attendance.findFirst({
       where: {
         userId,
+        date: {
+          gte: startOfDay,
+          lt: endOfDay,
+        },
       },
     });
 
     return NextResponse.json({
-      data: attendance,
+      data: todayAttendance,
       status: true,
       user: {
         id: userExists.id,

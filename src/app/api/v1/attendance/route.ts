@@ -21,6 +21,7 @@ export const GET = async () => {
 
     return NextResponse.json({
       data: attendance,
+      status: true,
     });
   } catch (error) {
     console.error(error);
@@ -38,6 +39,7 @@ export const POST = async (req: NextRequest) => {
   if (!userId) {
     return NextResponse.json({
       message: "User ID is required.",
+      status: false,
     });
   }
 
@@ -50,6 +52,7 @@ export const POST = async (req: NextRequest) => {
     if (!userExists) {
       return NextResponse.json({
         message: "User does not exist.",
+        status: false,
       });
     }
 
@@ -74,6 +77,7 @@ export const POST = async (req: NextRequest) => {
     if (todayAttendance) {
       return NextResponse.json({
         message: "Already clocked in today.",
+        status: false,
         user: {
           id: userExists.id,
           name: userExists.name,
@@ -97,6 +101,7 @@ export const POST = async (req: NextRequest) => {
 
     return NextResponse.json({
       message: "Clock-in successful!",
+      status: true,
       data: createAttendance,
       user: {
         name: userExists.name,
@@ -112,17 +117,19 @@ export const POST = async (req: NextRequest) => {
 
     return NextResponse.json({
       message: "Error clocking in.",
+      status: false,
       error: error,
     });
   }
 };
 
-export const PUT = async (req: NextRequest) => {
+export const PATCH = async (req: NextRequest) => {
   const { id, clockOutDesc } = (await req.json()) as Put;
 
   if (!id) {
     return NextResponse.json({
       message: "Attendance ID is required.",
+      status: false,
     });
   }
 
@@ -138,6 +145,7 @@ export const PUT = async (req: NextRequest) => {
     if (!attendanceRecord) {
       return NextResponse.json({
         message: "Attendance record does not exist.",
+        status: false,
       });
     }
 
@@ -145,6 +153,7 @@ export const PUT = async (req: NextRequest) => {
     if (attendanceRecord.clockOut) {
       return NextResponse.json({
         message: "Already clocked out.",
+        status: false,
         user: {
           name: attendanceRecord.user.name,
           email: attendanceRecord.user.email,
@@ -170,6 +179,7 @@ export const PUT = async (req: NextRequest) => {
 
     return NextResponse.json({
       message: "Clock-out successful!",
+      status: true,
       data: updateAttendance,
       user: {
         name: attendanceRecord.user.name,
@@ -183,10 +193,9 @@ export const PUT = async (req: NextRequest) => {
       },
     });
   } catch (error) {
-    console.error(error);
-
     return NextResponse.json({
       message: "Error clocking out.",
+      status: false,
       error: error,
     });
   }
