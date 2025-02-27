@@ -74,6 +74,16 @@ export const POST = async (req: NextRequest) => {
     if (todayAttendance) {
       return NextResponse.json({
         message: "Already clocked in today.",
+        user: {
+          id: userExists.id,
+          name: userExists.name,
+          email: userExists.email,
+        },
+        info: {
+          clockOut: `PUT /api/v1/attendance`,
+          clockOutBody: `{id: ${todayAttendance.id}, clockOutDesc: if any}`,
+          clockInTime: todayAttendance.clockIn.toLocaleString(),
+        },
       });
     }
 
@@ -88,6 +98,14 @@ export const POST = async (req: NextRequest) => {
     return NextResponse.json({
       message: "Clock-in successful!",
       data: createAttendance,
+      user: {
+        name: userExists.name,
+        email: userExists.email,
+      },
+      info: {
+        clockOut: `PUT /api/v1/attendance`,
+        clockOutBody: `{id: ${createAttendance.id}, clockOutDesc: if any}`,
+      },
     });
   } catch (error) {
     console.error(error);
@@ -112,6 +130,9 @@ export const PUT = async (req: NextRequest) => {
     // Check if the attendance record exists
     const attendanceRecord = await prisma.attendance.findUnique({
       where: { id },
+      include: {
+        user: true,
+      },
     });
 
     if (!attendanceRecord) {
@@ -124,6 +145,16 @@ export const PUT = async (req: NextRequest) => {
     if (attendanceRecord.clockOut) {
       return NextResponse.json({
         message: "Already clocked out.",
+        user: {
+          name: attendanceRecord.user.name,
+          email: attendanceRecord.user.email,
+        },
+        info: {
+          clockIn: `POST /api/v1/attendance`,
+          clockInBody: `{clockInDesc: if any, userId: ${attendanceRecord.userId}}`,
+          clockInTime: attendanceRecord.clockIn.toLocaleString(),
+          clockOutTime: attendanceRecord.clockOut.toLocaleString(),
+        },
       });
     }
 
@@ -140,6 +171,16 @@ export const PUT = async (req: NextRequest) => {
     return NextResponse.json({
       message: "Clock-out successful!",
       data: updateAttendance,
+      user: {
+        name: attendanceRecord.user.name,
+        email: attendanceRecord.user.email,
+      },
+      info: {
+        clockIn: `POST /api/v1/attendance`,
+        clockInBody: `{clockInDesc: if any, userId: ${attendanceRecord.userId}}`,
+        clockInTime: attendanceRecord.clockIn.toLocaleString(),
+        clockOutTime: updateAttendance.clockOut!.toLocaleString(),
+      },
     });
   } catch (error) {
     console.error(error);

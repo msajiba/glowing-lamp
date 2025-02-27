@@ -33,7 +33,11 @@ export async function GET(
 
     return NextResponse.json({
       data: attendance,
-      user: userExists,
+      user: {
+        id: userExists.id,
+        name: userExists.name,
+        email: userExists.email,
+      },
     });
   } catch (error) {
     console.error(error);
