@@ -1,0 +1,152 @@
+import prisma from "@/lib/prisma";
+import { NextRequest, NextResponse } from "next/server";
+
+type Post = {
+  clockInDesc?: string;
+  userId: number;
+};
+
+type Put = {
+  id: string;
+  clockOutDesc?: string;
+};
+
+export const GET = async () => {
+  try {
+    const attendance = await prisma.attendance.findMany({
+      include: {
+        user: true,
+      },
+    });
+
+    return NextResponse.json({
+      data: attendance,
+    });
+  } catch (error) {
+    console.error(error);
+
+    return NextResponse.json({
+      message: "Error fetching attendance records.",
+      error: error,
+    });
+  }
+};
+
+export const POST = async (req: NextRequest) => {
+  const { clockInDesc, userId } = (await req.json()) as Post;
+
+  if (!userId) {
+    return NextResponse.json({
+      message: "User ID is required.",
+    });
+  }
+
+  try {
+    // Check if the user exists
+    const userExists = await prisma.user.findUnique({
+      where: { id: userId },
+    });
+
+    if (!userExists) {
+      return NextResponse.json({
+        message: "User does not exist.",
+      });
+    }
+
+    // Get the start and end of the current day
+    const today = new Date();
+    const startOfDay = new Date(today);
+    startOfDay.setHours(0, 0, 0, 0);
+    const endOfDay = new Date(today);
+    endOfDay.setHours(23, 59, 59, 999);
+
+    // Check if there is already an attendance record for today
+    const todayAttendance = await prisma.attendance.findFirst({
+      where: {
+        userId,
+        date: {
+          gte: startOfDay,
+          lte: endOfDay,
+        },
+      },
+    });
+
+    if (todayAttendance) {
+      return NextResponse.json({
+        message: "Already clocked in today.",
+      });
+    }
+
+    // Create a new attendance record
+    const createAttendance = await prisma.attendance.create({
+      data: {
+        clockInDesc,
+        userId,
+      },
+    });
+
+    return NextResponse.json({
+      message: "Clock-in successful!",
+      data: createAttendance,
+    });
+  } catch (error) {
+    console.error(error);
+
+    return NextResponse.json({
+      message: "Error clocking in.",
+      error: error,
+    });
+  }
+};
+
+export const PUT = async (req: NextRequest) => {
+  const { id, clockOutDesc } = (await req.json()) as Put;
+
+  if (!id) {
+    return NextResponse.json({
+      message: "Attendance ID is required.",
+    });
+  }
+
+  try {
+    // Check if the attendance record exists
+    const attendanceRecord = await prisma.attendance.findUnique({
+      where: { id },
+    });
+
+    if (!attendanceRecord) {
+      return NextResponse.json({
+        message: "Attendance record does not exist.",
+      });
+    }
+
+    // Check if clockOut is already updated
+    if (attendanceRecord.clockOut) {
+      return NextResponse.json({
+        message: "Already clocked out.",
+      });
+    }
+
+    const updateAttendance = await prisma.attendance.update({
+      where: {
+        id,
+      },
+      data: {
+        clockOutDesc,
+        clockOut: new Date(),
+      },
+    });
+
+    return NextResponse.json({
+      message: "Clock-out successful!",
+      data: updateAttendance,
+    });
+  } catch (error) {
+    console.error(error);
+
+    return NextResponse.json({
+      message: "Error clocking out.",
+      error: error,
+    });
+  }
+};
