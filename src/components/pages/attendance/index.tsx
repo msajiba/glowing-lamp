@@ -9,15 +9,28 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import {
+  Pagination,
+  PaginationContent,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from "@/components/ui/pagination";
 
 import { UserAttendanceList } from "../home/types";
 import helpers from "@/utils/helpers";
+import { useState } from "react";
 
 type Props = {
   attendanceData: UserAttendanceList;
 };
 
 export default function AttendanceList({ attendanceData }: Props) {
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 10;
+  const totalPages = Math.ceil(attendanceData.data.length / itemsPerPage);
+
   return (
     <div className="container mx-auto py-10">
       <div>
@@ -57,7 +70,7 @@ export default function AttendanceList({ attendanceData }: Props) {
         </TableBody>
       </Table>
 
-      {/* <Pagination className="mt-4">
+      <Pagination className="mt-4">
         <PaginationContent>
           <PaginationItem>
             <PaginationPrevious
@@ -79,11 +92,10 @@ export default function AttendanceList({ attendanceData }: Props) {
               onClick={() =>
                 setCurrentPage((prev) => Math.min(prev + 1, totalPages))
               }
-              disabled={currentPage === totalPages}
             />
           </PaginationItem>
         </PaginationContent>
-      </Pagination> */}
+      </Pagination>
     </div>
   );
 }

@@ -17,6 +17,12 @@ export default function Navbar() {
           <div className="mr-2">
             <div className="ml-10 flex items-center space-x-4">
               <Link
+                href="/employees"
+                className="text-white bg-gray-700  px-3 py-2 rounded-md text-sm font-medium"
+              >
+                employees
+              </Link>
+              <Link
                 href="/attendance"
                 className="text-white bg-gray-700  px-3 py-2 rounded-md text-sm font-medium"
               >

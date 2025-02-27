@@ -33,3 +33,11 @@ export type UserAttendanceList = {
     email: string;
   };
 };
+
+export type UsersListType = {
+  data: {
+    id: number;
+    name: string;
+    email: string;
+  }[];
+};
