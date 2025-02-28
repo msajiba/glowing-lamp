@@ -31,6 +31,9 @@ export async function GET(
       where: {
         userId,
       },
+      orderBy: {
+        date: "desc",
+      },
     });
 
     return NextResponse.json({

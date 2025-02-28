@@ -31,10 +31,15 @@ export default function AttendanceSystem({ userAttendance }: Props) {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [description, setDescription] = useState("");
   const [actionType, setActionType] = useState("");
+  const [isMounted, setIsMounted] = useState(false);
 
   const router = useRouter();
 
+  // Handle initial state setup based on userAttendance
   useEffect(() => {
+    // First set our component as mounted
+    setIsMounted(true);
+
     const isClockIn = !!userAttendance?.data?.clockIn;
     const isClockOut = !!userAttendance?.data?.clockOut;
 
@@ -52,13 +57,21 @@ export default function AttendanceSystem({ userAttendance }: Props) {
     setButtonDisabled(isClockIn && isClockOut);
   }, [userAttendance]);
 
+  // Handle current time updates
   useEffect(() => {
-    const timer = setInterval(() => {
+    // Only run this effect on the client
+    if (isMounted) {
+      // Set initial time
       setCurrentTime(helpers.formatTime(new Date()));
-    }, 1000);
 
-    return () => clearInterval(timer);
-  }, []);
+      // Set up interval to update time
+      const timer = setInterval(() => {
+        setCurrentTime(helpers.formatTime(new Date()));
+      }, 1000);
+
+      return () => clearInterval(timer);
+    }
+  }, [isMounted]);
 
   const handleOpenModal = (type: string) => {
     setActionType(type);
@@ -104,6 +117,44 @@ export default function AttendanceSystem({ userAttendance }: Props) {
 
     handleCloseModal();
   };
+
+  // Early return during SSR or before client-side hydration is complete
+  if (!isMounted) {
+    return (
+      <div className="flex min-h-[80vh] flex-col items-center justify-center bg-background p-4">
+        <div className="w-full max-w-md rounded-lg border border-border bg-card p-8 shadow-sm">
+          <h1 className="mb-6 text-center text-2xl font-bold">
+            {userAttendance.user.name.toLocaleUpperCase()}
+          </h1>
+          <div className="mb-6 flex items-center justify-center gap-2 text-xl">
+            <Clock className="h-5 w-5" />
+            <span>Loading...</span>
+          </div>
+          {/* Render disabled buttons during loading */}
+          <div className="flex gap-4">
+            <Button
+              disabled={true}
+              className="flex-1"
+              size="lg"
+              variant="default"
+            >
+              <LogIn className="mr-2 h-4 w-4" />
+              Check In
+            </Button>
+            <Button
+              disabled={true}
+              className="flex-1"
+              size="lg"
+              variant="destructive"
+            >
+              <LogOut className="mr-2 h-4 w-4" />
+              Check Out
+            </Button>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="flex min-h-[80vh] flex-col items-center justify-center bg-background p-4">
@@ -156,12 +207,12 @@ export default function AttendanceSystem({ userAttendance }: Props) {
           )}
           {isClockInDisabled && !isClockOutDisabled ? (
             <p className="text-green-500 font-medium">
-              Your are currently checked in
+              You are currently checked in
             </p>
           ) : (
             clockOutTime && (
               <p className="text-amber-500 font-medium">
-                Your are currently checked out
+                You are currently checked out
               </p>
             )
           )}

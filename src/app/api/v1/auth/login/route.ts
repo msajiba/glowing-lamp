@@ -25,6 +25,7 @@ export const POST = async (request: Request) => {
         id: true,
         name: true,
         email: true,
+        role: true,
         password: true,
       },
     });
@@ -54,6 +55,13 @@ export const POST = async (request: Request) => {
     (await cookies()).set({
       name: "userId",
       value: existUser.id.toString(),
+      httpOnly: true,
+      path: "/",
+    });
+
+    (await cookies()).set({
+      name: "ROLE",
+      value: existUser.role,
       httpOnly: true,
       path: "/",
     });

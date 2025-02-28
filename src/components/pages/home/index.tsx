@@ -2,9 +2,10 @@ import React from "react";
 import dynamic from "next/dynamic";
 import { cookies } from "next/headers";
 import { fetchUserData } from "@/fetcher";
+import AttendanceSystemSkeleton from "./attendance-system-skeleton";
 
 const AttendanceSystem = dynamic(() => import("./attendance-system"), {
-  loading: () => <p>Loading...</p>,
+  loading: () => <AttendanceSystemSkeleton />,
 });
 
 const HomeIndex = async () => {
@@ -23,7 +24,7 @@ const HomeIndex = async () => {
       {userAttendance ? (
         <AttendanceSystem userAttendance={userAttendance} />
       ) : (
-        <p>Error loading attendance data.</p>
+        <AttendanceSystemSkeleton />
       )}
     </div>
   );

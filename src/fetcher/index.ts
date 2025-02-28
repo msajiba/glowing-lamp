@@ -4,6 +4,8 @@ import {
   UserAttendanceList,
   UsersListType,
 } from "@/components/pages/home/types";
+import prisma from "@/lib/prisma";
+import { cookies } from "next/headers";
 
 export const fetchUsers = async () => {
   try {
@@ -118,4 +120,22 @@ export const fetchTodayAttendanceList = async () => {
       data: [],
     };
   }
+};
+
+export const getCurrentUser = async () => {
+  const cookieStore = await cookies();
+  const userId = cookieStore.get("userId")?.value;
+
+  const user = await prisma.user.findFirst({
+    where: {
+      id: Number(userId),
+    },
+    select: {
+      id: true,
+      role: true,
+      email: true,
+      name: true,
+    },
+  });
+  return user;
 };

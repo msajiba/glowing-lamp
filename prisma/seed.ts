@@ -13,6 +13,7 @@ export async function userSeeder(prisma: PrismaClient) {
           id: user.id,
           name: user.name,
           email: user.email,
+          role: "USER",
           password: hashedPassword,
         },
       });
